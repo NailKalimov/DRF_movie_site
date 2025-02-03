@@ -2,7 +2,7 @@ from email.policy import default
 
 from rest_framework import serializers
 
-from .models import Movie, Review, Rating
+from .models import Movie, Review, Rating, Actor
 
 
 class MovieListSerializer(serializers.ModelSerializer):
@@ -46,16 +46,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('name', 'text', 'children')
 
 
-class MovieDetailSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    directors = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
-    actors = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
-    genres = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
-    reviews = ReviewSerializer(many=True)
-
-    class Meta:
-        model = Movie
-        exclude = ('draft',)
 
 
 class CreateRatingSerializer(serializers.ModelSerializer):
@@ -70,3 +60,26 @@ class CreateRatingSerializer(serializers.ModelSerializer):
             defaults={'star': validated_data.get("star")}
         )
         return rating
+
+
+class ActorsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actor
+        fields = ("id", "name", "image")
+
+class ActorDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actor
+        fields = "__all__"
+
+
+class MovieDetailSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    directors = ActorDetailSerializer(read_only=True, many=True)
+    actors = ActorDetailSerializer(read_only=True, many=True)
+    genres = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    reviews = ReviewSerializer(many=True)
+
+    class Meta:
+        model = Movie
+        exclude = ('draft',)
