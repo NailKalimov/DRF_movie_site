@@ -1,4 +1,3 @@
-from django.core.serializers import serialize
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,13 +10,28 @@ from django.db import models
 
 class MovieListView(APIView):
     def get(self, request):
-        movies = Movie.objects.filter(draft=False).annotate(
+        movies = (Movie.objects.filter(draft=False)
+        .annotate(
             rating_user=models.Count("ratings", filter=models.Q(ratings__ip=get_client_ip(request)))
         ).annotate(
-            middle_star = models.Sum(models.F('ratings__star')) / models.Count(models.F('ratings'))
-        )
+            middle_star=models.Sum(models.F('ratings__star')) / models.Count(models.F('ratings'))
+        ))
         serializer = MovieListSerializer(movies, many=True)
         return Response(serializer.data)
+
+
+# то же самое с использованием дженериков
+class MovieList(generics.ListAPIView):
+    def get_queryset(self):
+        res = (Movie.objects.filter(draft=False)
+        .annotate(
+            rating_user=models.Count("ratings", filter=models.Q(ratings__ip=get_client_ip(self.request)))
+        ).annotate(
+            middle_star=models.Sum(models.F('ratings__star')) / models.Count(models.F('ratings'))
+        ))
+        return res
+
+    serializer_class = MovieListSerializer
 
 
 class MovieDetailView(APIView):
@@ -27,12 +41,22 @@ class MovieDetailView(APIView):
         return Response(serializer.data)
 
 
+# то же самое с использованием дженериков
+class MovieDetail(generics.RetrieveAPIView):
+    queryset = Movie.objects.filter(draft=False)
+    serializer_class = MovieDetailSerializer
+
+
 class ReviewCreateView(APIView):
     def post(self, request):
         review = ReviewCreateSerializer(data=request.data)
         if review.is_valid():
             review.save()
         return Response(status=201)
+
+
+class ReviewCreate(generics.CreateAPIView):
+    serializer_class = ReviewCreateSerializer
 
 
 class AddStarRatingView(APIView):
@@ -45,6 +69,10 @@ class AddStarRatingView(APIView):
         else:
             return Response(status=400)
 
+class AddStarRating(generics.CreateAPIView):
+    serializer_class = CreateRatingSerializer
+    def perform_create(self, serializer):
+        serializer.save(ip=get_client_ip(self.request))
 
 class ActorsListView(generics.ListAPIView):
     queryset = Actor.objects.all()

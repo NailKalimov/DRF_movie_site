@@ -59,7 +59,7 @@ class CreateRatingSerializer(serializers.ModelSerializer):
             movie=validated_data.get("movie", None),
             defaults={'star': validated_data.get("star")}
         )
-        return rating
+        return rating[0]
 
 
 class ActorsListSerializer(serializers.ModelSerializer):
