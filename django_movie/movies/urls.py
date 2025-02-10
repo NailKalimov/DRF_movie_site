@@ -5,6 +5,9 @@ from . import views
 
 urlpatterns = [
     path("movie/", views.MovieListView.as_view()),
+    #.../movie-list/?year_min=1997
+    #../movie-list/?year_min=1997&year_max=2019
+    #../movie-list/?year_min=1997&year_max=2019&genres=Боевик
     path("movie-list/", views.MovieList.as_view()),
 
     path("movie/<int:pk>/", views.MovieDetailView.as_view()),

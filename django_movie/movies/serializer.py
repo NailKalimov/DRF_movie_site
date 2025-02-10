@@ -1,5 +1,3 @@
-from email.policy import default
-
 from rest_framework import serializers
 
 from .models import Movie, Review, Rating, Actor
@@ -8,6 +6,7 @@ from .models import Movie, Review, Rating, Actor
 class MovieListSerializer(serializers.ModelSerializer):
     rating_user = serializers.BooleanField()
     middle_star = serializers.IntegerField()
+
     class Meta:
         model = Movie
         fields = ('id', 'title', 'tagline', "category", "rating_user", 'middle_star')
@@ -17,6 +16,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
+
 
 
 class FilterListReviewSerializer(serializers.ListSerializer):
@@ -46,8 +46,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('name', 'text', 'children')
 
 
-
-
 class CreateRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
@@ -66,6 +64,7 @@ class ActorsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
         fields = ("id", "name", "image")
+
 
 class ActorDetailSerializer(serializers.ModelSerializer):
     class Meta:

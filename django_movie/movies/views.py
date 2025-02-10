@@ -1,11 +1,13 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .service import get_client_ip
+from .service import get_client_ip, MovieFilter
 from .models import Movie, Actor
 from .serializer import MovieListSerializer, MovieDetailSerializer, ReviewCreateSerializer, CreateRatingSerializer, \
     ActorsListSerializer, ActorDetailSerializer
 from django.db import models
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 
 class MovieListView(APIView):
@@ -22,6 +24,10 @@ class MovieListView(APIView):
 
 # то же самое с использованием дженериков
 class MovieList(generics.ListAPIView):
+    serializer_class = MovieListSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = MovieFilter
+
     def get_queryset(self):
         res = (Movie.objects.filter(draft=False)
         .annotate(
@@ -30,8 +36,6 @@ class MovieList(generics.ListAPIView):
             middle_star=models.Sum(models.F('ratings__star')) / models.Count(models.F('ratings'))
         ))
         return res
-
-    serializer_class = MovieListSerializer
 
 
 class MovieDetailView(APIView):
