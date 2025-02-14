@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from django_movie.movies.models import Movie
+from .models import Movie
 
 
 def get_client_ip(request):
