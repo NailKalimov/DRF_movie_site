@@ -35,6 +35,9 @@ class RecursiveFieldSerializer(serializers.ModelSerializer):
     def to_representation(self, value):
         serialised_data = ReviewSerializer(value, context=self.context).data
         return serialised_data
+    class Meta:
+        model = Review
+        fields = '__all__'
 
 
 class ReviewSerializer(serializers.ModelSerializer):

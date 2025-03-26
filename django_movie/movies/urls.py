@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from . import views
+from .yasg import urlpatterns as doc_urls
 
 
 urlpatterns = format_suffix_patterns([
@@ -12,3 +13,5 @@ urlpatterns = format_suffix_patterns([
     path('actors/', views.ActorsViewSet.as_view({'get': 'list'})),
     path('actors/<int:pk>', views.ActorsViewSet.as_view({'get': 'retrieve'})),
 ])
+
+urlpatterns += doc_urls
